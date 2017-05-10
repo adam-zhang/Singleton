@@ -26,7 +26,7 @@ class Singleton
 			if (!instance_)
 			{
 				locker_.lock();
-				if(!instance)
+				if(!instance_)
 				{
 					instance_ = new T;
 				}

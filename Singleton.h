@@ -1,11 +1,29 @@
 #ifndef __SINGLETON__H
 #define __SINGLETON__H
 
+#include <mutex>
+
 class FakeLocker
 {
 	public:
 		void lock() {}
 		void unlock() {}
+};
+
+class RealLocker
+{
+	private:
+		std::mutex mtx;
+	public:
+		void lock()
+		{
+			mtx.lock();
+		}
+
+		void unlock() 
+		{
+			mtx.unlock();
+		}
 };
 
 template<typename T, typename LOCKER = FakeLocker>

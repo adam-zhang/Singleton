@@ -1,7 +1,10 @@
 #ifndef __SINGLETON__H
 #define __SINGLETON__H
-
+#if _MSC_VER >= 1700
 #include <mutex>
+#else
+#include <Windows.h>
+#endif
 
 class FakeLocker
 {
@@ -10,6 +13,7 @@ class FakeLocker
 		void unlock() {}
 };
 
+#if _MSC_VER >= 1700
 class RealLocker
 {
 	private:
@@ -25,6 +29,33 @@ class RealLocker
 			mtx.unlock();
 		}
 };
+#else
+class RealLocker
+{
+public:
+	RealLocker()
+	{
+		InitializeCriticalSection(&cs_);
+	}
+	~RealLocker()
+	{
+		DeleteCriticalSection(&cs_);
+	}
+
+	void lock()
+	{
+		EnterCriticalSection(&cs_);
+	}
+
+	void Unlock()
+	{
+		LeaveCriticalSection(&cs_);
+	}
+private:
+	CRITICAL_SECTION cs_;
+};
+      
+#endif
 
 template<typename T, typename LOCKER = FakeLocker>
 class Singleton
